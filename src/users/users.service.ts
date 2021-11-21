@@ -10,8 +10,11 @@ import { IUser } from './interfaces/user.interface';
 export class UsersService {
   constructor(@InjectModel('users') private readonly userModel: Model<IUser>) {}
 
-  async findOne(payload: FilterQuery<IUser>): Promise<any> {
-    const user = await this.userModel.findOne(payload).exec();
+  async findOne(filter: FilterQuery<IUser>, projection = {}) {
+    const user = await this.userModel.findOne(filter, projection).exec();
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     return user;
   }
 
@@ -37,14 +40,12 @@ export class UsersService {
     }
   }
 
-  async updatePassword(id: string, password: string) {
-    const user = await this.userModel
-      .findByIdAndUpdate(id, { password })
-      .exec();
-    if (!user) {
+  async update(filter: FilterQuery<IUser>, projection = {}) {
+    const user = await this.userModel.updateOne(filter, projection).exec();
+    if (!user?.matchedCount) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return { _id: user._id };
+    return user;
   }
 }
