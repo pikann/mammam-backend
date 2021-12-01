@@ -1,0 +1,72 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CD
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Installing packages
+        run: npm install
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: AKIAYWPHDVSK7P56KA5T
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-southeast-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: 598022007957.dkr.ecr.ap-southeast-1.amazonaws.com
+          ECR_REPOSITORY: mammam-dev
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          sed -i "s,ENV PORT=.*,ENV PORT=80," Dockerfile
+          sed -i "s,ENV DATABASE_HOST=.*,ENV DATABASE_HOST=${{ secrets.DATABASE_HOST }}," Dockerfile
+          sed -i "s,ENV SECRET_KEY_ACCESS_TOKEN=.*,ENV SECRET_KEY_ACCESS_TOKEN=${{ secrets.SECRET_KEY_ACCESS_TOKEN }}," Dockerfile
+          sed -i "s,ENV ACCESS_TOKEN_EXP_TIME=.*,ENV ACCESS_TOKEN_EXP_TIME=3600," Dockerfile
+          sed -i "s,ENV SECRET_KEY_REFRESH_TOKEN=.*,ENV SECRET_KEY_REFRESH_TOKEN=${{ secrets.SECRET_KEY_REFRESH_TOKEN }}," Dockerfile
+          sed -i "s,ENV REFRESH_TOKEN_EXP_TIME=.*,ENV REFRESH_TOKEN_EXP_TIME=604800," Dockerfile
+          sed -i "s,ENV SALT_PASSWORD=.*,ENV SALT_PASSWORD=${{ secrets.SALT_PASSWORD }}," Dockerfile
+
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ./cicd/deploy/aws-ecs/task-definition.json
+          container-name: backend-api-container-dev
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: mammam-api-service-dev
+          cluster: mammam-backend-dev
+          wait-for-service-stability: true

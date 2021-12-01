@@ -19,7 +19,7 @@ export class UsersService {
   }
 
   async create(email: string, password: string) {
-    if (await this.findOne({ email })) {
+    if (await this.userModel.findOne({ email }).exec()) {
       throw new HttpException('Email was registered', HttpStatus.BAD_REQUEST);
     }
 
