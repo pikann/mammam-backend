@@ -20,7 +20,7 @@ export class UsersController {
   @Get('profile')
   async getProfile(@Request() req) {
     return await this.usersService.findOne(
-      { id: req.user.id },
+      { _id: req.user.id },
       { password: 0, vector: 0 },
     );
   }
@@ -31,6 +31,6 @@ export class UsersController {
     @Request() req,
     @Body(new ValidatePayloadExistsPipe()) body: UpdateProfileDto,
   ) {
-    return await this.usersService.update({ id: req.user.id }, body);
+    return await this.usersService.update({ _id: req.user.id }, body);
   }
 }
