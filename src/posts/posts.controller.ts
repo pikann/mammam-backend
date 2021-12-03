@@ -7,8 +7,10 @@ import {
   Patch,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 
+import GetS3PresignedURL from '../util/s3-presigned-url';
 import { IdDto } from '../dto/id.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -54,5 +56,11 @@ export class PostsController {
       _id: id,
       author: req.user.id,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('presigned-url')
+  async getPresignedURL() {
+    return await GetS3PresignedURL();
   }
 }
