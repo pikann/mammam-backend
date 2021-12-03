@@ -5,6 +5,8 @@ import { compare } from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { IUser } from '../users/interfaces/user.interface';
 import { UserRoles } from './enums/user-roles.enum';
+import { ILoginResult } from './interfaces/login-result.interface';
+import { IRefreshTokenResult } from './interfaces/refresh-token-result.interface';
 
 @Injectable()
 export class AuthService {
@@ -13,18 +15,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<IUser> {
     const user = await this.usersService.findOne({ email });
     if (user) {
       if (await compare(password, user.password)) {
-        const { password, ...result } = user;
-        return result;
+        return user;
       }
     }
     return null;
   }
 
-  async login(user: IUser) {
+  async login(user: IUser): Promise<ILoginResult> {
     const payload = { id: user._id, email: user.email, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -41,7 +42,7 @@ export class AuthService {
     };
   }
 
-  async register(email: string, password: string) {
+  async register(email: string, password: string): Promise<ILoginResult> {
     const { _id } = await this.usersService.create(email, password);
     const payload = { id: _id, email: email, role: UserRoles.User };
     return {
@@ -59,11 +60,16 @@ export class AuthService {
     };
   }
 
-  async refreshToken(user: IUser) {
+  async refreshToken(user: IUser): Promise<IRefreshTokenResult> {
     const payload = { email: user.email, id: user.id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
+      refresh_token: this.jwtService.sign(payload, {
+        secret: process.env.SECRET_KEY_REFRESH_TOKEN,
+        expiresIn: +process.env.REFRESH_TOKEN_EXP_TIME,
+      }),
       access_token_exp_time: +process.env.ACCESS_TOKEN_EXP_TIME,
+      refresh_token_exp_time: +process.env.REFRESH_TOKEN_EXP_TIME,
     };
   }
 }
