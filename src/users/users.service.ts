@@ -30,7 +30,7 @@ export class UsersService {
       password,
       role: UserRoles.User,
     });
-    if (user.save()) {
+    if (await user.save()) {
       return { _id: user._id };
     } else {
       throw new HttpException(
