@@ -16,8 +16,8 @@ export class Post {
   @Prop({ type: String, required: true })
   url: string;
 
-  @Prop({ type: [String], default: [] })
-  seens: string[];
+  @Prop({ type: [SchemaType.Types.ObjectId], default: [] })
+  views: User[];
 
   @Prop({ type: SchemaType.Types.ObjectId, ref: 'users', required: true })
   author: User;
@@ -25,11 +25,11 @@ export class Post {
   @Prop({ type: String, default: '' })
   restaurant: string;
 
-  @Prop({ type: String, required: true })
-  create_at: string;
+  @Prop({ type: Date, required: true })
+  createdAt: Date;
 
-  @Prop({ type: [String], default: [] })
-  likes: string[];
+  @Prop({ type: [SchemaType.Types.ObjectId], default: [] })
+  likes: User[];
 
   @Prop({ type: [String], default: [] })
   comments: string[];
