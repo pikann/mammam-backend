@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AnyKeys, FilterQuery, Model } from 'mongoose';
+import { AnyKeys, FilterQuery, Model, Types } from 'mongoose';
 import { UpdateResult, DeleteResult } from 'mongodb';
 
 import { IObjectId } from '../interfaces/object-id.interface';
-import { IPost } from './interfaces/post.interface';
+import { IPost, IShowPost } from './interfaces/post.interface';
 
 @Injectable()
 export class PostsService {
@@ -45,5 +45,49 @@ export class PostsService {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
     return result;
+  }
+
+  async getList(
+    page: number,
+    perPage: number,
+    userId: string,
+  ): Promise<IShowPost[]> {
+    const posts: IShowPost[] = await this.postModel.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      { $unwind: '$author' },
+      {
+        $set: {
+          likeTotal: { $size: '$likes' },
+          commentTotal: { $size: '$comments' },
+          viewTotal: { $size: '$views' },
+          shareTotal: 0,
+          isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+          createdAt: { $toLong: '$createdAt' },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: page * perPage },
+      { $limit: perPage },
+      {
+        $project: {
+          vector: 0,
+          comments: 0,
+          likes: 0,
+          'author.vector': 0,
+          'author.role': 0,
+          'author.email': 0,
+          'author.password': 0,
+          views: 0,
+        },
+      },
+    ]);
+    return posts;
   }
 }

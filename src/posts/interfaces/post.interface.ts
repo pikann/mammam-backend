@@ -5,11 +5,32 @@ export interface IPost extends Document {
   readonly description: string;
   readonly type: string;
   readonly url: string;
-  readonly seens: string[];
+  readonly views: string[];
   readonly author: string;
   readonly restaurant: string;
-  readonly create_at: Date;
+  readonly createdAt: Date;
   readonly likes: string[];
   readonly comments: string[];
   readonly vector: number[];
+}
+
+export interface IShowUser extends Document {
+  readonly _id: string;
+  readonly avatar: string;
+  readonly username: string;
+}
+
+export interface IShowPost extends Document {
+  readonly _id: string;
+  readonly createdAt: number;
+  readonly restaurant: string;
+  readonly author: IShowUser;
+  readonly url: string;
+  readonly type: string;
+  readonly description: string;
+  readonly likeTotal: number;
+  readonly commentTotal: number;
+  readonly viewTotal: number;
+  readonly shareTotal: number;
+  readonly isLiked: boolean;
 }

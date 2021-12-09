@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   Get,
+  Put,
 } from '@nestjs/common';
 
 import GetS3PresignedURL from '../util/s3-presigned-url';
@@ -29,7 +30,7 @@ export class PostsController {
       ...body,
       type: PostTypes.Image,
       author: req.user.id,
-      create_at: new Date(),
+      createdAt: new Date(),
     });
   }
 
@@ -62,5 +63,29 @@ export class PostsController {
   @Get('presigned-url')
   async getPresignedURL() {
     return await GetS3PresignedURL();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/like')
+  async like(@Request() req, @Param() { id }: IdDto) {
+    return await this.postsService.update(
+      { _id: id },
+      { $addToSet: { likes: req.user.id } },
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/view')
+  async view(@Request() req, @Param() { id }: IdDto) {
+    return await this.postsService.update(
+      { _id: id },
+      { $addToSet: { views: req.user.id } },
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getList(@Request() req) {
+    return await this.postsService.getList(0, 10, req.user.id);
   }
 }

@@ -14,7 +14,11 @@ export class User {
   @Prop({ type: String, required: true })
   email: string;
 
-  @Prop({ type: String, default: '' })
+  @Prop({
+    type: String,
+    default:
+      'https://mammam-photo-video-bucket-dev.s3.ap-southeast-1.amazonaws.com/default-avatar.png',
+  })
   avatar: string;
 
   @Prop({ type: String, required: true })
