@@ -9,6 +9,7 @@ import {
   Delete,
   Get,
   Put,
+  Query,
 } from '@nestjs/common';
 
 import GetS3PresignedURL from '../util/s3-presigned-url';
@@ -85,7 +86,13 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getList(@Request() req) {
-    return await this.postsService.getList(0, 10, req.user.id);
+  async getList(
+    @Request() req,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+    return await this.postsService.getList(page, perpage, req.user.id);
   }
 }
