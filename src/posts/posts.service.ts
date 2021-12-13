@@ -63,6 +63,14 @@ export class PostsService {
       },
       { $unwind: '$author' },
       {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'parent',
+          as: 'comments',
+        },
+      },
+      {
         $set: {
           likeTotal: { $size: '$likes' },
           commentTotal: { $size: '$comments' },

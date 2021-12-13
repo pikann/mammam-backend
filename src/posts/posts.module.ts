@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { CommentsModule } from '../comments/comments.module';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { PostSchema } from './schemas/post.schema';
@@ -13,8 +14,10 @@ import { PostSchema } from './schemas/post.schema';
         schema: PostSchema,
       },
     ]),
+    forwardRef(() => CommentsModule),
   ],
   controllers: [PostsController],
   providers: [PostsService],
+  exports: [PostsService],
 })
 export class PostsModule {}
