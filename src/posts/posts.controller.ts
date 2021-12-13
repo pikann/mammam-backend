@@ -14,7 +14,9 @@ import {
 
 import GetS3PresignedURL from '../util/s3-presigned-url';
 import { IdDto } from '../dto/id.dto';
+import { CommentsService } from '../comments/comments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostTypes } from './enums/post-type.enum';
@@ -22,7 +24,10 @@ import { PostsService } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private postsService: PostsService) {}
+  constructor(
+    private postsService: PostsService,
+    private commentsService: CommentsService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -103,5 +108,46 @@ export class PostsController {
     if (!page) page = 0;
     if (!perpage) perpage = 10;
     return await this.postsService.getList(page, perpage, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/comments')
+  async getListComments(
+    @Request() req,
+    @Param() { id }: IdDto,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+    const total = await this.commentsService.count({ parent: id });
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      comments: await this.commentsService.getList(
+        id,
+        page,
+        perpage,
+        req.user.id,
+      ),
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/comments')
+  async commentPost(
+    @Request() req,
+    @Param() { id }: IdDto,
+    @Body() body: CreateCommentDto,
+  ) {
+    await this.postsService.findOne({ _id: id }, { _id: 1 });
+    return await this.commentsService.create({
+      ...body,
+      author: req.user.id,
+      parent: id,
+      createdAt: new Date(),
+    });
   }
 }

@@ -10,7 +10,6 @@ export interface IPost extends Document {
   readonly restaurant: string;
   readonly createdAt: Date;
   readonly likes: string[];
-  readonly comments: string[];
   readonly vector: number[];
 }
 
