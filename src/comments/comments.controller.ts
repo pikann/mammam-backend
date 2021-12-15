@@ -72,6 +72,24 @@ export class CommentsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Put(':id/like')
+  async like(@Request() req, @Param() { id }: IdDto) {
+    return await this.commentsService.update(
+      { _id: id },
+      { $addToSet: { likes: req.user.id } },
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/dislike')
+  async dislike(@Request() req, @Param() { id }: IdDto) {
+    return await this.commentsService.update(
+      { _id: id },
+      { $pull: { likes: req.user.id } },
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(':id/replies')
   async repliesComment(
     @Request() req,
