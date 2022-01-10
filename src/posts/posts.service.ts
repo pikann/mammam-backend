@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AnyKeys, FilterQuery, Model, Types } from 'mongoose';
 import { UpdateResult, DeleteResult } from 'mongodb';
 
+import AWSRequestClient from '../util/aws-request';
 import { IObjectId } from '../interfaces/object-id.interface';
 import { IPost, IShowPost } from './interfaces/post.interface';
 
@@ -19,7 +20,12 @@ export class PostsService {
   }
 
   async create(payload: AnyKeys<IPost>): Promise<IObjectId> {
-    const post = await new this.postModel(payload);
+    const vector = (
+      await AWSRequestClient.post(process.env.ML_PATH, {
+        videoUrl: payload.url,
+      })
+    ).data.vector;
+    const post = await new this.postModel({ ...payload, vector });
     if (await post.save()) {
       return { _id: post._id };
     } else {

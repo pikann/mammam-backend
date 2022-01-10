@@ -19,7 +19,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostTypes } from './enums/post-type.enum';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -34,7 +33,6 @@ export class PostsController {
   async create(@Request() req, @Body() body: CreatePostDto) {
     return await this.postsService.create({
       ...body,
-      type: PostTypes.Image,
       author: req.user.id,
       createdAt: new Date(),
     });
