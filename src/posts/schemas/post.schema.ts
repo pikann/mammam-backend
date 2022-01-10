@@ -11,9 +11,6 @@ export class Post {
   description: string;
 
   @Prop({ type: String, required: true })
-  type: string;
-
-  @Prop({ type: String, required: true })
   url: string;
 
   @Prop({ type: [SchemaType.Types.ObjectId], default: [] })
