@@ -11,9 +11,11 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 import GetS3PresignedURL from '../util/s3-presigned-url';
 import { IdDto } from '../dto/id.dto';
+import { UsersService } from '../users/users.service';
 import { CommentsService } from '../comments/comments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateCommentDto } from '../comments/dto/create-comment.dto';
@@ -26,6 +28,7 @@ export class PostsController {
   constructor(
     private postsService: PostsService,
     private commentsService: CommentsService,
+    private userService: UsersService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -72,19 +75,23 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Put(':id/like')
   async like(@Request() req, @Param() { id }: IdDto) {
-    return await this.postsService.update(
+    const learnPromise = this.userService.learn(req.user.id, id);
+    const likePromise = this.postsService.update(
       { _id: id },
       { $addToSet: { likes: req.user.id } },
     );
+    return (await Promise.all([learnPromise, likePromise]))[1];
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':id/dislike')
   async dislike(@Request() req, @Param() { id }: IdDto) {
-    return await this.postsService.update(
+    const learnPromise = this.userService.learn(req.user.id, id, true);
+    const dislikePromise = this.postsService.update(
       { _id: id },
       { $pull: { likes: req.user.id } },
     );
+    return (await Promise.all([learnPromise, dislikePromise]))[1];
   }
 
   @UseGuards(JwtAuthGuard)
@@ -100,12 +107,16 @@ export class PostsController {
   @Get()
   async getList(
     @Request() req,
-    @Query('page') page: number,
     @Query('perpage') perpage: number,
+    @Query('availables') availables: string,
   ) {
-    if (!page) page = 0;
     if (!perpage) perpage = 10;
-    return await this.postsService.getList(page, perpage, req.user.id);
+
+    let availableList = [];
+    if (availables && availables !== '')
+      availableList = availables.split(',').map((id) => new Types.ObjectId(id));
+
+    return await this.postsService.getList(perpage, req.user.id, availableList);
   }
 
   @UseGuards(JwtAuthGuard)

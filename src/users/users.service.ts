@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcrypt';
 import { FilterQuery, Model } from 'mongoose';
@@ -7,10 +13,15 @@ import { UpdateResult } from 'mongodb';
 import { IObjectId } from '../interfaces/object-id.interface';
 import { UserRoles } from '../auth/enums/user-roles.enum';
 import { IUser } from './interfaces/user.interface';
+import { PostsService } from '../posts/posts.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('users') private readonly userModel: Model<IUser>) {}
+  constructor(
+    @InjectModel('users') private readonly userModel: Model<IUser>,
+    @Inject(forwardRef(() => PostsService))
+    private postsService: PostsService,
+  ) {}
 
   async findOne(filter: FilterQuery<IUser>, projection = {}): Promise<IUser> {
     const user = await this.userModel.findOne(filter, projection).exec();
@@ -52,5 +63,40 @@ export class UsersService {
     }
 
     return result;
+  }
+
+  async learn(userId: string, postId: string, negative = false): Promise<void> {
+    const learningRate = negative ? -0.2 / 1.2 : 0.2;
+
+    const postVectorPromise = this.postsService.findOne(
+      { _id: postId },
+      { _id: 0, vector: 1 },
+    );
+
+    const userVectorPromise = this.findOne(
+      { _id: userId },
+      { _id: 0, vector: 1 },
+    );
+
+    const vectorData = await Promise.all([
+      postVectorPromise,
+      userVectorPromise,
+    ]);
+
+    const postVector = vectorData[0].vector;
+    const userVector = vectorData[1].vector;
+
+    const sumUserVector = userVector.reduce(
+      (partial_sum, a) => partial_sum + a,
+      0,
+    );
+
+    const newVector = userVector.map(
+      (value, index) =>
+        ((value + postVector[index] * learningRate) * 10) /
+        (sumUserVector + learningRate * 10),
+    );
+
+    await this.update({ _id: userId }, { vector: newVector });
   }
 }
