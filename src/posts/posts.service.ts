@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnyKeys, FilterQuery, Model, Types } from 'mongoose';
 import { UpdateResult, DeleteResult } from 'mongodb';
@@ -12,6 +18,7 @@ import { UsersService } from '../users/users.service';
 export class PostsService {
   constructor(
     @InjectModel('posts') private readonly postModel: Model<IPost>,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 
