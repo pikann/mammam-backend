@@ -6,6 +6,7 @@ import { CommentsModule } from '../comments/comments.module';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { PostSchema } from './schemas/post.schema';
+import { UserSchema } from '../users/schemas/user.schema';
 
 @Module({
   imports: [
@@ -13,6 +14,12 @@ import { PostSchema } from './schemas/post.schema';
       {
         name: 'posts',
         schema: PostSchema,
+      },
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: 'users',
+        schema: UserSchema,
       },
     ]),
     forwardRef(() => CommentsModule),
