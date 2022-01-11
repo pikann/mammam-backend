@@ -22,6 +22,7 @@ import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
+import { GetPostsTag } from './enums/get-posts-tag.enum';
 
 @Controller('posts')
 export class PostsController {
@@ -107,6 +108,7 @@ export class PostsController {
   @Get()
   async getList(
     @Request() req,
+    @Query('tag') tag: string,
     @Query('perpage') perpage: number,
     @Query('availables') availables: string,
   ) {
@@ -116,7 +118,20 @@ export class PostsController {
     if (availables && availables !== '')
       availableList = availables.split(',').map((id) => new Types.ObjectId(id));
 
-    return await this.postsService.getList(perpage, req.user.id, availableList);
+    switch (tag) {
+      case GetPostsTag.Popular:
+        return await this.postsService.getListPopular(
+          perpage,
+          req.user.id,
+          availableList,
+        );
+      default:
+        return await this.postsService.getListForYou(
+          perpage,
+          req.user.id,
+          availableList,
+        );
+    }
   }
 
   @UseGuards(JwtAuthGuard)
