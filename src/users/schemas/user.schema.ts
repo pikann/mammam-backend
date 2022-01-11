@@ -24,7 +24,7 @@ export class User {
   @Prop({ type: String, required: true })
   role: string;
 
-  @Prop({ type: [Number], default: [] })
+  @Prop({ type: [Number], default: new Array(101).fill(0) })
   vector: number[];
 }
 

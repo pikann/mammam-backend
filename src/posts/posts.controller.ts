@@ -11,6 +11,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 import GetS3PresignedURL from '../util/s3-presigned-url';
 import { IdDto } from '../dto/id.dto';
@@ -100,12 +101,16 @@ export class PostsController {
   @Get()
   async getList(
     @Request() req,
-    @Query('page') page: number,
     @Query('perpage') perpage: number,
+    @Query('availables') availables: string,
   ) {
-    if (!page) page = 0;
     if (!perpage) perpage = 10;
-    return await this.postsService.getList(page, perpage, req.user.id);
+
+    let availableList = [];
+    if (availables && availables !== '')
+      availableList = availables.split(',').map((id) => new Types.ObjectId(id));
+
+    return await this.postsService.getList(perpage, req.user.id, availableList);
   }
 
   @UseGuards(JwtAuthGuard)

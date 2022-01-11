@@ -6,10 +6,14 @@ import { UpdateResult, DeleteResult } from 'mongodb';
 import AWSRequestClient from '../util/aws-request';
 import { IObjectId } from '../interfaces/object-id.interface';
 import { IPost, IShowPost } from './interfaces/post.interface';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel('posts') private readonly postModel: Model<IPost>) {}
+  constructor(
+    @InjectModel('posts') private readonly postModel: Model<IPost>,
+    private usersService: UsersService,
+  ) {}
 
   async findOne(filter: FilterQuery<IPost>, projection = {}): Promise<IPost> {
     const post = await this.postModel.findOne(filter, projection).exec();
@@ -54,11 +58,40 @@ export class PostsService {
   }
 
   async getList(
-    page: number,
     perPage: number,
     userId: string,
+    availableList: Types.ObjectId[],
   ): Promise<IShowPost[]> {
+    const userVector = (
+      await this.usersService.findOne({ _id: userId }, { _id: 0, vector: 1 })
+    ).vector;
+
     const posts: IShowPost[] = await this.postModel.aggregate([
+      { $match: { views: { $not: { $eq: new Types.ObjectId(userId) } } } },
+      { $match: { _id: { $not: { $in: availableList } } } },
+      {
+        $set: {
+          score: {
+            $reduce: {
+              input: { $range: [0, { $size: '$vector' }] },
+              initialValue: 0,
+              in: {
+                $add: [
+                  '$$value',
+                  {
+                    $multiply: [
+                      { $arrayElemAt: ['$vector', '$$this'] },
+                      { $arrayElemAt: [userVector, '$$this'] },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      { $sort: { score: -1, createdAt: -1 } },
+      { $limit: perPage },
       {
         $lookup: {
           from: 'users',
@@ -86,9 +119,6 @@ export class PostsService {
           createdAt: { $toLong: '$createdAt' },
         },
       },
-      { $sort: { createdAt: -1 } },
-      { $skip: page * perPage },
-      { $limit: perPage },
       {
         $project: {
           vector: 0,
@@ -99,6 +129,7 @@ export class PostsService {
           'author.email': 0,
           'author.password': 0,
           views: 0,
+          score: 0,
         },
       },
     ]);
