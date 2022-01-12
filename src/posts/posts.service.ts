@@ -155,8 +155,6 @@ export class PostsService {
     ).vector;
 
     const posts: IShowPost[] = await this.userModel.aggregate([
-      { $match: { views: { $not: { $eq: new Types.ObjectId(userId) } } } },
-      { $match: { _id: { $not: { $in: availableList } } } },
       {
         $set: {
           score: {
@@ -226,6 +224,8 @@ export class PostsService {
           description: { $first: '$description' },
         },
       },
+      { $match: { views: { $not: { $eq: new Types.ObjectId(userId) } } } },
+      { $match: { _id: { $not: { $in: availableList } } } },
       { $sort: { score: -1, createdAt: -1 } },
       { $limit: perPage },
       {
