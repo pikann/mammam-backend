@@ -174,4 +174,17 @@ export class PostsController {
       createdAt: new Date(),
     });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('user/:id')
+  async getListPostOfUser(
+    @Param() { id }: IdDto,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+
+    return await this.postsService.getListOfUser(page, perpage, id);
+  }
 }
