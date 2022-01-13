@@ -21,6 +21,9 @@ export class User {
   })
   avatar: string;
 
+  @Prop({ type: String, default: '' })
+  bio: string;
+
   @Prop({ type: String, required: true })
   role: string;
 
