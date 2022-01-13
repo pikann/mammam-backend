@@ -9,4 +9,9 @@ export class UpdateProfileDto {
   @IsString()
   @IsNotEmpty()
   avatar: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  bio: string;
 }
