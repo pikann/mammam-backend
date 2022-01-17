@@ -4,6 +4,7 @@ export interface IPost extends Document {
   readonly _id: string;
   readonly description: string;
   readonly url: string;
+  readonly thumbnail: string;
   readonly views: string[];
   readonly author: string;
   readonly restaurant: string;
@@ -24,6 +25,7 @@ export interface IShowPost extends Document {
   readonly restaurant: string;
   readonly author: IShowUser;
   readonly url: string;
+  readonly thumbnail: string;
   readonly type: string;
   readonly description: string;
   readonly likeTotal: number;

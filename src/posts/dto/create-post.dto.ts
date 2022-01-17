@@ -14,6 +14,11 @@ export class CreatePostDto {
   @IsUrl()
   url: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @IsUrl()
+  thumbnail: string;
+
   @IsOptional()
   @IsMongoId()
   restaurant: string;
