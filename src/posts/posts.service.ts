@@ -203,6 +203,7 @@ export class PostsService {
           views: '$liked.views',
           url: '$liked.url',
           description: '$liked.description',
+          thumbnail: '$liked.thumbnail',
         },
       },
       {
@@ -222,6 +223,7 @@ export class PostsService {
           views: { $first: '$views' },
           url: { $first: '$url' },
           description: { $first: '$description' },
+          thumbnail: { $first: '$thumbnail' },
         },
       },
       { $match: { views: { $not: { $eq: new Types.ObjectId(userId) } } } },

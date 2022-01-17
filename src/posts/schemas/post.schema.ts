@@ -13,6 +13,9 @@ export class Post {
   @Prop({ type: String, required: true })
   url: string;
 
+  @Prop({ type: String, required: true })
+  thumbnail: string;
+
   @Prop({ type: [SchemaType.Types.ObjectId], default: [] })
   views: User[];
 
