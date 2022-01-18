@@ -17,7 +17,7 @@ export class User {
   @Prop({
     type: String,
     default:
-      'https://mammam-photo-video-bucket-dev.s3.ap-southeast-1.amazonaws.com/avatar-default.png',
+      'https://mammam-bucket-dev.s3.ap-southeast-1.amazonaws.com/avatar-default.png',
   })
   avatar: string;
 

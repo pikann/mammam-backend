@@ -51,7 +51,7 @@ jobs:
           sed -i "s,ENV REFRESH_TOKEN_EXP_TIME=.*,ENV REFRESH_TOKEN_EXP_TIME=604800," Dockerfile
           sed -i "s,ENV SALT_PASSWORD=.*,ENV SALT_PASSWORD=${{ secrets.SALT_PASSWORD }}," Dockerfile
           sed -i "s,ENV AWS_S3_REGION=.*,ENV AWS_S3_REGION=ap-southeast-1," Dockerfile
-          sed -i "s,ENV AWS_ACCESS_KEY=.*,ENV AWS_ACCESS_KEY=AKIAYWPHDVSK7P56KA5T," Dockerfile
+          sed -i "s,ENV AWS_ACCESS_KEY=.*,ENV AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}," Dockerfile
           sed -i "s,ENV AWS_SECRET_KEY=.*,ENV AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}," Dockerfile
           sed -i "s,ENV ML_PATH=.*,ENV ML_PATH=${{ secrets.ML_PATH }}," Dockerfile
 
