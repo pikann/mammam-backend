@@ -3,7 +3,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 export default async () => {
-  const bucketName = 'mammam-photo-video-bucket-dev';
+  const bucketName = 'mammam-bucket-dev';
   const client = new S3Client({
     region: process.env.AWS_S3_REGION,
     credentials: {
