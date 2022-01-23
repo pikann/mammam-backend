@@ -10,3 +10,10 @@ export interface IUser extends Document {
   readonly role: string;
   readonly vector: number[];
 }
+
+export interface IShowUser {
+  readonly _id: string;
+  readonly username: string;
+  readonly avatar: string;
+  readonly bio: string;
+}

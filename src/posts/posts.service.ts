@@ -313,4 +313,63 @@ export class PostsService {
       },
     ]);
   }
+
+  async search(
+    keyword: string,
+    page: number,
+    perPage: number,
+    userId: string,
+  ): Promise<IShowPost[]> {
+    return this.postModel.aggregate([
+      {
+        $match: {
+          $and: keyword.split(' ').map((key) => {
+            return { description: { $regex: key, $options: 'i' } };
+          }),
+        },
+      },
+      { $sort: { createdAt: 1 } },
+      { $skip: page * perPage },
+      { $limit: perPage },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      { $unwind: '$author' },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'parent',
+          as: 'comments',
+        },
+      },
+      {
+        $set: {
+          likeTotal: { $size: '$likes' },
+          commentTotal: { $size: '$comments' },
+          viewTotal: { $size: '$views' },
+          shareTotal: 0,
+          isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+          createdAt: { $toLong: '$createdAt' },
+        },
+      },
+      {
+        $project: {
+          vector: 0,
+          comments: 0,
+          likes: 0,
+          'author.vector': 0,
+          'author.role': 0,
+          'author.email': 0,
+          'author.password': 0,
+          views: 0,
+        },
+      },
+    ]);
+  }
 }

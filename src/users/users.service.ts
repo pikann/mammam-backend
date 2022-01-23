@@ -12,7 +12,7 @@ import { UpdateResult } from 'mongodb';
 
 import { IObjectId } from '../interfaces/object-id.interface';
 import { UserRoles } from '../auth/enums/user-roles.enum';
-import { IUser } from './interfaces/user.interface';
+import { IShowUser, IUser } from './interfaces/user.interface';
 import { PostsService } from '../posts/posts.service';
 
 @Injectable()
@@ -98,5 +98,32 @@ export class UsersService {
     );
 
     await this.update({ _id: userId }, { vector: newVector });
+  }
+
+  async search(
+    keyword: string,
+    page: number,
+    perPage: number,
+  ): Promise<IShowUser[]> {
+    return await this.userModel.aggregate([
+      {
+        $match: {
+          $and: keyword.split(' ').map((key) => {
+            return { username: { $regex: key, $options: 'i' } };
+          }),
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $skip: page * perPage },
+      { $limit: perPage },
+      {
+        $project: {
+          vector: 0,
+          role: 0,
+          email: 0,
+          password: 0,
+        },
+      },
+    ]);
   }
 }
