@@ -187,4 +187,19 @@ export class PostsController {
 
     return await this.postsService.getListOfUser(page, perpage, id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('search')
+  async search(
+    @Request() req,
+    @Query('keyword') keyword: string,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!keyword) keyword = '';
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+
+    return await this.postsService.search(keyword, page, perpage, req.user.id);
+  }
 }

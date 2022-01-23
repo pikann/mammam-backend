@@ -8,6 +8,7 @@ import {
   Put,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { hash } from 'bcrypt';
 
@@ -32,6 +33,20 @@ export class UsersController {
       { _id: req.user.id },
       { password: 0, vector: 0 },
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('search')
+  async search(
+    @Query('keyword') keyword: string,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!keyword) keyword = '';
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+
+    return await this.usersService.search(keyword, page, perpage);
   }
 
   @UseGuards(JwtAuthGuard)
