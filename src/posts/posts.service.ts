@@ -66,6 +66,10 @@ export class PostsService {
     return result;
   }
 
+  async count(filter: FilterQuery<IPost>): Promise<number> {
+    return await this.postModel.count(filter).exec();
+  }
+
   async getListForYou(
     perPage: number,
     userId: string,
