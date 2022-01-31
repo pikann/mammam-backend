@@ -65,6 +65,10 @@ export class UsersService {
     return result;
   }
 
+  async count(filter: FilterQuery<IUser>): Promise<number> {
+    return await this.userModel.count(filter).exec();
+  }
+
   async learn(userId: string, postId: string, negative = false): Promise<void> {
     const learningRate = negative ? -0.2 / 1.2 : 0.2;
 

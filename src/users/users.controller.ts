@@ -46,7 +46,19 @@ export class UsersController {
     if (!page) page = 0;
     if (!perpage) perpage = 10;
 
-    return await this.usersService.search(keyword, page, perpage);
+    const total = await this.usersService.count({
+      $and: keyword.split(' ').map((key) => {
+        return { username: { $regex: key, $options: 'i' } };
+      }),
+    });
+
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      data: await this.usersService.search(keyword, page, perpage),
+    };
   }
 
   @UseGuards(JwtAuthGuard)
