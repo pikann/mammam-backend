@@ -185,7 +185,17 @@ export class PostsController {
     if (!page) page = 0;
     if (!perpage) perpage = 10;
 
-    return await this.postsService.getListOfUser(page, perpage, id);
+    const total = await this.postsService.count({
+      author: id,
+    });
+
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      data: await this.postsService.getListOfUser(page, perpage, id),
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -200,6 +210,18 @@ export class PostsController {
     if (!page) page = 0;
     if (!perpage) perpage = 10;
 
-    return await this.postsService.search(keyword, page, perpage, req.user.id);
+    const total = await this.postsService.count({
+      $and: keyword.split(' ').map((key) => {
+        return { description: { $regex: key, $options: 'i' } };
+      }),
+    });
+
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      data: await this.postsService.search(keyword, page, perpage, req.user.id),
+    };
   }
 }
