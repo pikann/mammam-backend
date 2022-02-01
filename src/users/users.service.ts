@@ -126,6 +126,7 @@ export class UsersService {
           role: 0,
           email: 0,
           password: 0,
+          banning: 0,
         },
       },
     ]);

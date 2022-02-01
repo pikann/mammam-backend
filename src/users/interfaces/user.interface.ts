@@ -9,6 +9,7 @@ export interface IUser extends Document {
   readonly bio: string;
   readonly role: string;
   readonly vector: number[];
+  readonly banning: boolean;
 }
 
 export interface IShowUser {
