@@ -29,6 +29,9 @@ export class User {
 
   @Prop({ type: [Number], default: new Array(101).fill(0) })
   vector: number[];
+
+  @Prop({ type: Boolean, required: true, default: false })
+  banning: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

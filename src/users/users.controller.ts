@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  Param,
 } from '@nestjs/common';
 import { hash } from 'bcrypt';
 
@@ -18,6 +19,10 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
+import { Roles } from '../auth/decorators/role.decorator';
+import { UserRoles } from '../auth/enums/user-roles.enum';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { IdDto } from '../dto/id.dto';
 
 @Controller('users')
 export class UsersController {
@@ -31,7 +36,7 @@ export class UsersController {
   async getProfile(@Request() req) {
     return await this.usersService.findOne(
       { _id: req.user.id },
-      { password: 0, vector: 0 },
+      { password: 0, vector: 0, banning: 0 },
     );
   }
 
@@ -88,5 +93,19 @@ export class UsersController {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Put(':id/ban')
+  @Roles(UserRoles.Admin)
+  async ban(@Param() { id }: IdDto) {
+    return await this.usersService.update({ _id: id }, { banning: true });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Put(':id/unban')
+  @Roles(UserRoles.Admin)
+  async unban(@Param() { id }: IdDto) {
+    return await this.usersService.update({ _id: id }, { banning: false });
   }
 }

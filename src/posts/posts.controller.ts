@@ -23,6 +23,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 import { GetPostsTag } from './enums/get-posts-tag.enum';
+import { UserRoles } from '../auth/enums/user-roles.enum';
 
 @Controller('posts')
 export class PostsController {
@@ -61,10 +62,16 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Request() req, @Param() { id }: IdDto) {
-    return await this.postsService.delete({
-      _id: id,
-      author: req.user.id,
-    });
+    if (req.user.role === UserRoles.Admin) {
+      return await this.postsService.delete({
+        _id: id,
+      });
+    } else {
+      return await this.postsService.delete({
+        _id: id,
+        author: req.user.id,
+      });
+    }
   }
 
   @UseGuards(JwtAuthGuard)
