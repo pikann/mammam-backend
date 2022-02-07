@@ -245,4 +245,10 @@ export class PostsController {
       data: await this.postsService.search(keyword, page, perpage, req.user.id),
     };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getOne(@Request() req, @Param() { id }: IdDto) {
+    return await this.postsService.getOne(id, req.user.id);
+  }
 }

@@ -379,4 +379,54 @@ export class PostsService {
       },
     ]);
   }
+
+  async getOne(id: string, userId: string): Promise<IShowPost> {
+    return (
+      await this.postModel.aggregate([
+        {
+          $match: { _id: new Types.ObjectId(id) },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author',
+          },
+        },
+        { $unwind: '$author' },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'parent',
+            as: 'comments',
+          },
+        },
+        {
+          $set: {
+            likeTotal: { $size: '$likes' },
+            commentTotal: { $size: '$comments' },
+            viewTotal: { $size: '$views' },
+            shareTotal: 0,
+            isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+            createdAt: { $toLong: '$createdAt' },
+          },
+        },
+        {
+          $project: {
+            vector: 0,
+            comments: 0,
+            likes: 0,
+            'author.vector': 0,
+            'author.role': 0,
+            'author.email': 0,
+            'author.password': 0,
+            'author.banning': 0,
+            views: 0,
+          },
+        },
+      ])
+    )[0];
+  }
 }
