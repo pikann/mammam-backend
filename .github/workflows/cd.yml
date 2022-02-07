@@ -54,6 +54,8 @@ jobs:
           sed -i "s,ENV AWS_ACCESS_KEY=.*,ENV AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}," Dockerfile
           sed -i "s,ENV AWS_SECRET_KEY=.*,ENV AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}," Dockerfile
           sed -i "s,ENV ML_PATH=.*,ENV ML_PATH=${{ secrets.ML_PATH }}," Dockerfile
+          sed -i "s,ENV SOCKET_HOST=.*,ENV SOCKET_HOST=http://socket.mammam.online," Dockerfile
+          sed -i "s,ENV SOCKET_BACKEND_KEY=.*,ENV SOCKET_BACKEND_KEY=${{ secrets.SOCKET_BACKEND_KEY }}," Dockerfile
 
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
