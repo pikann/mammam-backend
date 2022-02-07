@@ -17,6 +17,7 @@ export interface IShowUser extends Document {
   readonly _id: string;
   readonly avatar: string;
   readonly username: string;
+  readonly bio: string;
 }
 
 export interface IShowPost extends Document {
