@@ -5,7 +5,10 @@ import { UpdateResult } from 'mongodb';
 
 import socketClient from '../util/socket-client';
 import { IObjectId } from '../interfaces/object-id.interface';
-import { INotification } from './interfaces/notification.interface';
+import {
+  INotification,
+  IShowNotification,
+} from './interfaces/notification.interface';
 
 @Injectable()
 export class NotificationsService {
@@ -45,8 +48,12 @@ export class NotificationsService {
     return await this.notificationModel.count(filter).exec();
   }
 
-  async getList(page: number, perPage: number, userId: string): Promise<any> {
-    return this.notificationModel.aggregate([
+  async getList(
+    page: number,
+    perPage: number,
+    userId: string,
+  ): Promise<IShowNotification[]> {
+    return await this.notificationModel.aggregate([
       {
         $match: { to: new Types.ObjectId(userId) },
       },
