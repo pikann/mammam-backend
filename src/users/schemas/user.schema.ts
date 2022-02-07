@@ -31,7 +31,7 @@ export class User {
   vector: number[];
 
   @Prop({ type: Boolean, required: true, default: false })
-  banning: string;
+  banning: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
