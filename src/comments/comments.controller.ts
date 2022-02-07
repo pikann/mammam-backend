@@ -10,16 +10,21 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { IdDto } from 'src/dto/id.dto';
 
+import { IdDto } from '../dto/id.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private commentsService: CommentsService) {}
+  constructor(
+    private commentsService: CommentsService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
@@ -96,7 +101,18 @@ export class CommentsController {
     @Param() { id }: IdDto,
     @Body() body: CreateCommentDto,
   ) {
-    await this.commentsService.findOne({ _id: id }, { _id: 1 });
+    const comment = await this.commentsService.findOne({ _id: id });
+
+    if (req.user.id !== comment.author) {
+      this.notificationsService.create({
+        type: NotificationType.ReplyComment,
+        from: req.user.id,
+        about: comment.parent,
+        to: comment.author,
+        at: new Date(),
+      });
+    }
+
     return await this.commentsService.create({
       ...body,
       author: req.user.id,

@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { NotificationsModule } from '../notifications/notifications.module';
 import { CommentsController } from './comments.controller';
 import { CommentsService } from './comments.service';
 import { CommentSchema } from './schemas/comment.schema';
@@ -13,6 +14,7 @@ import { CommentSchema } from './schemas/comment.schema';
         schema: CommentSchema,
       },
     ]),
+    forwardRef(() => NotificationsModule),
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

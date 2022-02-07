@@ -17,6 +17,7 @@ import GetS3PresignedURL from '../util/s3-presigned-url';
 import { IdDto } from '../dto/id.dto';
 import { UsersService } from '../users/users.service';
 import { CommentsService } from '../comments/comments.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -24,6 +25,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 import { GetPostsTag } from './enums/get-posts-tag.enum';
 import { UserRoles } from '../auth/enums/user-roles.enum';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 @Controller('posts')
 export class PostsController {
@@ -31,6 +33,7 @@ export class PostsController {
     private postsService: PostsService,
     private commentsService: CommentsService,
     private userService: UsersService,
+    private notificationsService: NotificationsService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -173,7 +176,18 @@ export class PostsController {
     @Param() { id }: IdDto,
     @Body() body: CreateCommentDto,
   ) {
-    await this.postsService.findOne({ _id: id }, { _id: 1 });
+    const post = await this.postsService.findOne({ _id: id });
+
+    if (req.user.id !== post.author) {
+      this.notificationsService.create({
+        type: NotificationType.Comment,
+        from: req.user.id,
+        about: post._id,
+        to: post.author,
+        at: new Date(),
+      });
+    }
+
     return await this.commentsService.create({
       ...body,
       author: req.user.id,

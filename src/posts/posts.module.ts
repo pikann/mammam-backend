@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { UsersModule } from '../users/users.module';
 import { CommentsModule } from '../comments/comments.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { PostSchema } from './schemas/post.schema';
@@ -24,6 +25,7 @@ import { UserSchema } from '../users/schemas/user.schema';
     ]),
     forwardRef(() => CommentsModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => NotificationsModule),
   ],
   controllers: [PostsController],
   providers: [PostsService],
