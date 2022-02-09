@@ -54,7 +54,7 @@ export class NotificationsService {
       {
         $match: { to: new Types.ObjectId(userId) },
       },
-      { $sort: { createdAt: -1 } },
+      { $sort: { at: -1 } },
       { $skip: page * perPage },
       { $limit: perPage },
       {
