@@ -20,10 +20,7 @@ export class NotificationsService {
   async create(payload: AnyKeys<INotification>): Promise<IObjectId> {
     const notification = await new this.notificationModel(payload);
     if (await notification.save()) {
-      socketClient.emit('message', {
-        room: notification.to,
-        data: notification,
-      });
+      this.sendNotification(notification);
       return { _id: notification._id };
     } else {
       throw new HttpException(
@@ -77,6 +74,7 @@ export class NotificationsService {
       {
         $project: {
           to: 0,
+          seen: 0,
           'from.vector': 0,
           'from.role': 0,
           'from.email': 0,
@@ -85,5 +83,43 @@ export class NotificationsService {
         },
       },
     ]);
+  }
+
+  async sendNotification(notification: INotification) {
+    const showNotification = await this.notificationModel.aggregate([
+      {
+        $match: { _id: new Types.ObjectId(notification._id) },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'from',
+          foreignField: '_id',
+          as: 'from',
+        },
+      },
+      {
+        $set: {
+          isSeen: false,
+          at: { $toLong: '$at' },
+        },
+      },
+      {
+        $project: {
+          to: 0,
+          seen: 0,
+          'from.vector': 0,
+          'from.role': 0,
+          'from.email': 0,
+          'from.password': 0,
+          'from.banning': 0,
+        },
+      },
+    ]);
+
+    socketClient.emit('message', {
+      room: notification.to,
+      data: showNotification,
+    });
   }
 }
