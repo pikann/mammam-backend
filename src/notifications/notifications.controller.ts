@@ -29,10 +29,12 @@ export class NotificationsController {
       data: await this.notificationsService.getList(page, perpage, req.user.id),
     };
 
-    await this.notificationsService.update(
-      { to: req.user.id },
-      { $addToSet: { seen: req.user.id } },
-    );
+    if (response.data.length > 0) {
+      await this.notificationsService.update(
+        { to: req.user.id },
+        { $addToSet: { seen: req.user.id } },
+      );
+    }
 
     return response;
   }
