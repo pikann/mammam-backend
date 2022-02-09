@@ -29,11 +29,20 @@ export class NotificationsController {
       data: await this.notificationsService.getList(page, perpage, req.user.id),
     };
 
-    this.notificationsService.update(
+    await this.notificationsService.update(
       { to: req.user.id },
       { $addToSet: { seen: req.user.id } },
     );
 
     return response;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/count')
+  async countNotification(@Request() req) {
+    return await this.notificationsService.count({
+      to: req.user.id,
+      seen: { $not: { $eq: req.user.id } },
+    });
   }
 }

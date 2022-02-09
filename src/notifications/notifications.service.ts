@@ -20,7 +20,7 @@ export class NotificationsService {
   async create(payload: AnyKeys<INotification>): Promise<IObjectId> {
     const notification = await new this.notificationModel(payload);
     if (await notification.save()) {
-      this.sendNotification(notification);
+      await this.sendNotification(notification);
       return { _id: notification._id };
     } else {
       throw new HttpException(
@@ -119,7 +119,7 @@ export class NotificationsService {
       ])
     )[0];
 
-    socketClient.emit('message', {
+    await socketClient.emit('message', {
       room: notification.to,
       data: showNotification,
     });
