@@ -103,7 +103,7 @@ export class CommentsController {
   ) {
     const comment = await this.commentsService.findOne({ _id: id });
 
-    if (req.user.id !== comment.author) {
+    if (req.user.id !== '' + comment.author) {
       this.notificationsService.create({
         type: NotificationType.ReplyComment,
         from: req.user.id,

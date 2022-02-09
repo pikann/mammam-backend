@@ -178,7 +178,7 @@ export class PostsController {
   ) {
     const post = await this.postsService.findOne({ _id: id });
 
-    if (req.user.id !== post.author) {
+    if (req.user.id !== '' + post.author) {
       this.notificationsService.create({
         type: NotificationType.Comment,
         from: req.user.id,
