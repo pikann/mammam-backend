@@ -46,6 +46,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('search')
   async search(
+    @Request() req,
     @Query('keyword') keyword: string,
     @Query('page') page: number,
     @Query('perpage') perpage: number,
@@ -65,7 +66,7 @@ export class UsersController {
       totalPage: Math.ceil(total / perpage),
       page,
       perpage,
-      data: await this.usersService.search(keyword, page, perpage),
+      data: await this.usersService.search(keyword, page, perpage, req.user.id),
     };
   }
 
