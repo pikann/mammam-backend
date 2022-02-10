@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcrypt';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { UpdateResult } from 'mongodb';
 
 import { IObjectId } from '../interfaces/object-id.interface';
@@ -108,6 +108,7 @@ export class UsersService {
     keyword: string,
     page: number,
     perPage: number,
+    userId: string,
   ): Promise<IShowUser[]> {
     return await this.userModel.aggregate([
       {
@@ -120,6 +121,13 @@ export class UsersService {
       { $sort: { _id: 1 } },
       { $skip: page * perPage },
       { $limit: perPage },
+      {
+        $set: {
+          isFollowed: {
+            $in: [new Types.ObjectId(userId), '$followers'],
+          },
+        },
+      },
       {
         $project: {
           vector: 0,

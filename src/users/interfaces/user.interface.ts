@@ -18,4 +18,5 @@ export interface IShowUser {
   readonly username: string;
   readonly avatar: string;
   readonly bio: string;
+  readonly isFollowed: boolean;
 }
