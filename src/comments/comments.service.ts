@@ -58,6 +58,9 @@ export class CommentsService {
           replyTotal: { $size: '$replies' },
           isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
           createdAt: { $toLong: '$createdAt' },
+          'author.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$author.followers'],
+          },
         },
       },
       { $set: { sortScore: { $sum: ['$likeTotal', '$replyTotal'] } } },

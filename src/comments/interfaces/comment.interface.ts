@@ -14,6 +14,7 @@ export interface IShowUser extends Document {
   readonly avatar: string;
   readonly username: string;
   readonly bio: string;
+  readonly isFollowed: boolean;
 }
 
 export interface IShowComment extends Document {

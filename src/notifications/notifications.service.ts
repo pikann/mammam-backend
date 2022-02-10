@@ -65,6 +65,9 @@ export class NotificationsService {
         $set: {
           isSeen: { $in: [new Types.ObjectId(userId), '$seen'] },
           at: { $toLong: '$at' },
+          'from.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$from.followers'],
+          },
         },
       },
       {
@@ -100,6 +103,9 @@ export class NotificationsService {
           $set: {
             isSeen: false,
             at: { $toLong: '$at' },
+            'from.isFollowed': {
+              $in: [new Types.ObjectId(notification.to[0]), '$from.followers'],
+            },
           },
         },
         {
