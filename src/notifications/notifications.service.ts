@@ -23,11 +23,6 @@ export class NotificationsService {
     if (await notification.save()) {
       await this.sendNotification(notification);
       return { _id: notification._id };
-    } else {
-      throw new HttpException(
-        'Database error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
@@ -81,6 +76,7 @@ export class NotificationsService {
           'from.email': 0,
           'from.password': 0,
           'from.banning': 0,
+          'from.followers': 0,
         },
       },
     ]);
@@ -115,6 +111,7 @@ export class NotificationsService {
             'from.email': 0,
             'from.password': 0,
             'from.banning': 0,
+            'from.followers': 0,
           },
         },
       ])

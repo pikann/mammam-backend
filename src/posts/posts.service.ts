@@ -142,6 +142,7 @@ export class PostsService {
           'author.email': 0,
           'author.password': 0,
           'author.banning': 0,
+          'author.followers': 0,
           views: 0,
           score: 0,
         },
@@ -272,12 +273,68 @@ export class PostsService {
           'author.email': 0,
           'author.password': 0,
           'author.banning': 0,
+          'author.followers': 0,
           views: 0,
           score: 0,
         },
       },
     ]);
     return posts;
+  }
+
+  async getListFollowing(
+    perPage: number,
+    userId: string,
+    availableList: Types.ObjectId[],
+  ): Promise<IShowPost[]> {
+    return this.postModel.aggregate([
+      { $match: { views: { $not: { $eq: new Types.ObjectId(userId) } } } },
+      { $match: { _id: { $not: { $in: availableList } } } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      { $unwind: '$author' },
+      { $match: { 'author.followers': new Types.ObjectId(userId) } },
+      { $sort: { createdAt: -1 } },
+      { $limit: perPage },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'parent',
+          as: 'comments',
+        },
+      },
+      {
+        $set: {
+          likeTotal: { $size: '$likes' },
+          commentTotal: { $size: '$comments' },
+          viewTotal: { $size: '$views' },
+          shareTotal: 0,
+          isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+          createdAt: { $toLong: '$createdAt' },
+        },
+      },
+      {
+        $project: {
+          vector: 0,
+          comments: 0,
+          likes: 0,
+          'author.vector': 0,
+          'author.role': 0,
+          'author.email': 0,
+          'author.password': 0,
+          'author.banning': 0,
+          'author.followers': 0,
+          views: 0,
+        },
+      },
+    ]);
   }
 
   async getListOfUser(
@@ -374,6 +431,7 @@ export class PostsService {
           'author.email': 0,
           'author.password': 0,
           'author.banning': 0,
+          'author.followers': 0,
           views: 0,
         },
       },
@@ -423,6 +481,7 @@ export class PostsService {
             'author.email': 0,
             'author.password': 0,
             'author.banning': 0,
+            'author.followers': 0,
             views: 0,
           },
         },
