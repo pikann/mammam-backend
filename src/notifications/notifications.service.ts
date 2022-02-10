@@ -4,6 +4,7 @@ import { AnyKeys, FilterQuery, Model, Types } from 'mongoose';
 import { UpdateResult } from 'mongodb';
 
 import socketClient from '../util/socket-client';
+import firebaseClient from '../util/firebase';
 import { IObjectId } from '../interfaces/object-id.interface';
 import {
   INotification,
@@ -123,5 +124,17 @@ export class NotificationsService {
       room: notification.to,
       data: showNotification,
     });
+
+    await firebaseClient
+      .messaging()
+      .sendToCondition(
+        notification.to.map((id) => `'${id}' in topics`).join(' || '),
+        {
+          notification: {
+            title: 'New notification',
+            body: 'You have a new notification',
+          },
+        },
+      );
   }
 }
