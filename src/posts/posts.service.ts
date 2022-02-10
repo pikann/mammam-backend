@@ -130,6 +130,9 @@ export class PostsService {
           shareTotal: 0,
           isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
           createdAt: { $toLong: '$createdAt' },
+          'author.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$author.followers'],
+          },
         },
       },
       {
@@ -261,6 +264,9 @@ export class PostsService {
           shareTotal: 0,
           isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
           createdAt: { $toLong: '$createdAt' },
+          'author.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$author.followers'],
+          },
         },
       },
       {
@@ -318,6 +324,9 @@ export class PostsService {
           shareTotal: 0,
           isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
           createdAt: { $toLong: '$createdAt' },
+          'author.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$author.followers'],
+          },
         },
       },
       {
@@ -419,6 +428,9 @@ export class PostsService {
           shareTotal: 0,
           isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
           createdAt: { $toLong: '$createdAt' },
+          'author.isFollowed': {
+            $in: [new Types.ObjectId(userId), '$author.followers'],
+          },
         },
       },
       {
@@ -469,6 +481,9 @@ export class PostsService {
             shareTotal: 0,
             isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
             createdAt: { $toLong: '$createdAt' },
+            'author.isFollowed': {
+              $in: [new Types.ObjectId(userId), '$author.followers'],
+            },
           },
         },
         {
