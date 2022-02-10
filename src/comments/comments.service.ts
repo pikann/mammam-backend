@@ -75,6 +75,7 @@ export class CommentsService {
           'author.email': 0,
           'author.password': 0,
           'author.banning': 0,
+          'author.followers': 0,
         },
       },
     ]);

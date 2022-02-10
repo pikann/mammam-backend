@@ -135,6 +135,12 @@ export class PostsController {
           req.user.id,
           availableList,
         );
+      case GetPostsTag.Following:
+        return await this.postsService.getListFollowing(
+          perpage,
+          req.user.id,
+          availableList,
+        );
       default:
         return await this.postsService.getListForYou(
           perpage,
