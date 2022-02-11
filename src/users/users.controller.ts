@@ -140,4 +140,22 @@ export class UsersController {
       { $pull: { followers: req.user.id } },
     );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/follow')
+  async countFollow(@Request() req, @Param() { id }: IdDto) {
+    const followersPromise = this.usersService.findOne(
+      { _id: id },
+      { _id: 0, followers: 1 },
+    );
+
+    const followingsPromise = this.usersService.count({ followers: id });
+
+    const [followers, followings] = await Promise.all([
+      followersPromise,
+      followingsPromise,
+    ]);
+
+    return { followers: followers.followers.length, followings };
+  }
 }
