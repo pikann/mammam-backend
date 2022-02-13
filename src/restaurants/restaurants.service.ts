@@ -39,6 +39,10 @@ export class RestaurantsService {
     return result;
   }
 
+  async count(filter: FilterQuery<IRestaurant>): Promise<number> {
+    return await this.restaurantModel.count(filter).exec();
+  }
+
   async search(
     keyword: string,
     page: number,
