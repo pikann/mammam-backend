@@ -15,6 +15,10 @@ export class CreateRestaurantDto {
   @IsNotEmpty()
   bio: string;
 
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
   @IsNumber()
   latitude: number;
 

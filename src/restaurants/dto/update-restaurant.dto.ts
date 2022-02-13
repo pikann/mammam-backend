@@ -17,6 +17,11 @@ export class UpdateRestaurantDto {
   bio: string;
 
   @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsOptional()
   @IsNumber()
   latitude: number;
 

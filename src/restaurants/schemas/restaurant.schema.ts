@@ -19,6 +19,9 @@ export class Restaurant {
   })
   avatar: string;
 
+  @Prop({ type: String, required: true, default: '' })
+  address: string;
+
   @Prop({ type: SchemaType.Types.ObjectId, ref: 'users', required: true })
   admin: User;
 
