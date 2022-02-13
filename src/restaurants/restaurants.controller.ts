@@ -64,13 +64,26 @@ export class RestaurantsController {
 
     switch (tag) {
       default:
-        return await this.restaurantsService.search(
-          keyword,
+        const total = await this.restaurantsService.count({
+          $match: {
+            $and: keyword.split(' ').map((key) => {
+              return { name: { $regex: key, $options: 'i' } };
+            }),
+          },
+        });
+        return {
+          total,
+          totalPage: Math.ceil(total / perpage),
           page,
           perpage,
-          latitude,
-          longitude,
-        );
+          data: await this.restaurantsService.search(
+            keyword,
+            page,
+            perpage,
+            latitude,
+            longitude,
+          ),
+        };
     }
   }
 }
