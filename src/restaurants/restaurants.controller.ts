@@ -86,4 +86,30 @@ export class RestaurantsController {
         };
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  async getMy(
+    @Request() req,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+
+    const total = await this.restaurantsService.count({ admin: req.user.id });
+
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      data: await this.restaurantsService.find(
+        { admin: req.user.id },
+        {},
+        page,
+        perpage,
+      ),
+    };
+  }
 }
