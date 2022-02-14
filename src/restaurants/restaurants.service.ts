@@ -13,6 +13,22 @@ export class RestaurantsService {
     private readonly restaurantModel: Model<IRestaurant>,
   ) {}
 
+  async find(
+    filter: FilterQuery<IRestaurant>,
+    projection = {},
+    page: number,
+    perPage: number,
+    sort = { _id: -1 },
+  ): Promise<IRestaurant[]> {
+    const restaurants = await this.restaurantModel
+      .find(filter, projection)
+      .sort(sort)
+      .skip(page * perPage)
+      .limit(perPage)
+      .exec();
+    return restaurants;
+  }
+
   async create(payload: AnyKeys<IRestaurant>): Promise<IObjectId> {
     const restaurant = await new this.restaurantModel(payload);
     if (await restaurant.save()) {
