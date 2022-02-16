@@ -12,7 +12,6 @@ export class CreateRestaurantDto {
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   bio: string;
 
   @IsString()
