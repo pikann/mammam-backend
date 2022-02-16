@@ -8,6 +8,7 @@ import {
   Param,
   Get,
   Query,
+  Delete,
 } from '@nestjs/common';
 
 import { IdDto } from '../dto/id.dto';
@@ -15,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { RestaurantsService } from './restaurants.service';
+import { UserRoles } from '../auth/enums/user-roles.enum';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -43,6 +45,21 @@ export class RestaurantsController {
       },
       body,
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(@Request() req, @Param() { id }: IdDto) {
+    if (req.user.role === UserRoles.Admin) {
+      return await this.restaurantsService.delete({
+        _id: id,
+      });
+    } else {
+      return await this.restaurantsService.delete({
+        _id: id,
+        admin: req.user.id,
+      });
+    }
   }
 
   @UseGuards(JwtAuthGuard)
