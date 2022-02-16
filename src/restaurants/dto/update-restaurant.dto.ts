@@ -13,7 +13,6 @@ export class UpdateRestaurantDto {
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   bio: string;
 
   @IsOptional()

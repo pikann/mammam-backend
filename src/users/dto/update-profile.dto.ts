@@ -12,6 +12,5 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   bio: string;
 }
