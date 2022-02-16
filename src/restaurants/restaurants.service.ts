@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AnyKeys, FilterQuery, Model } from 'mongoose';
-import { UpdateResult } from 'mongodb';
+import { UpdateResult, DeleteResult } from 'mongodb';
 
 import { IObjectId } from '../interfaces/object-id.interface';
 import { IRestaurant } from './interfaces/restaurant.interface';
@@ -52,6 +52,14 @@ export class RestaurantsService {
       throw new HttpException('Restaurant not found', HttpStatus.NOT_FOUND);
     }
 
+    return result;
+  }
+
+  async delete(filter: FilterQuery<IRestaurant>): Promise<DeleteResult> {
+    const result = await this.restaurantModel.deleteOne(filter).exec();
+    if (result.deletedCount === 0) {
+      throw new HttpException('Restaurant not found', HttpStatus.NOT_FOUND);
+    }
     return result;
   }
 
