@@ -123,6 +123,19 @@ export class PostsService {
         },
       },
       {
+        $lookup: {
+          from: 'restaurants',
+          localField: 'restaurant',
+          foreignField: '_id',
+          as: 'restaurant',
+        },
+      },
+      {
+        $set: {
+          restaurant: { $first: '$restaurant' },
+        },
+      },
+      {
         $set: {
           likeTotal: { $size: '$likes' },
           commentTotal: { $size: '$comments' },
@@ -250,6 +263,19 @@ export class PostsService {
       { $unwind: '$author' },
       {
         $lookup: {
+          from: 'restaurants',
+          localField: 'restaurant',
+          foreignField: '_id',
+          as: 'restaurant',
+        },
+      },
+      {
+        $set: {
+          restaurant: { $first: '$restaurant' },
+        },
+      },
+      {
+        $lookup: {
           from: 'comments',
           localField: '_id',
           foreignField: 'parent',
@@ -308,6 +334,19 @@ export class PostsService {
       { $match: { 'author.followers': new Types.ObjectId(userId) } },
       { $sort: { createdAt: -1 } },
       { $limit: perPage },
+      {
+        $lookup: {
+          from: 'restaurants',
+          localField: 'restaurant',
+          foreignField: '_id',
+          as: 'restaurant',
+        },
+      },
+      {
+        $set: {
+          restaurant: { $first: '$restaurant' },
+        },
+      },
       {
         $lookup: {
           from: 'comments',
@@ -414,6 +453,19 @@ export class PostsService {
       { $unwind: '$author' },
       {
         $lookup: {
+          from: 'restaurants',
+          localField: 'restaurant',
+          foreignField: '_id',
+          as: 'restaurant',
+        },
+      },
+      {
+        $set: {
+          restaurant: { $first: '$restaurant' },
+        },
+      },
+      {
+        $lookup: {
           from: 'comments',
           localField: '_id',
           foreignField: 'parent',
@@ -465,6 +517,19 @@ export class PostsService {
           },
         },
         { $unwind: '$author' },
+        {
+          $lookup: {
+            from: 'restaurants',
+            localField: 'restaurant',
+            foreignField: '_id',
+            as: 'restaurant',
+          },
+        },
+        {
+          $set: {
+            restaurant: { $first: '$restaurant' },
+          },
+        },
         {
           $lookup: {
             from: 'comments',

@@ -1,5 +1,7 @@
 import { Document } from 'mongoose';
 
+import { IRestaurant } from '../../restaurants/interfaces/restaurant.interface';
+
 export interface IPost extends Document {
   readonly _id: string;
   readonly description: string;
@@ -24,7 +26,7 @@ export interface IShowUser extends Document {
 export interface IShowPost extends Document {
   readonly _id: string;
   readonly createdAt: number;
-  readonly restaurant: string;
+  readonly restaurant: IRestaurant;
   readonly author: IShowUser;
   readonly url: string;
   readonly thumbnail: string;
