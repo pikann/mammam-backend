@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as SchemaType } from 'mongoose';
 
+import { Restaurant } from '../../restaurants/schemas/restaurant.schema';
 import { User } from '../../users/schemas/user.schema';
 
 export type PostDocument = Post & Document;
@@ -22,8 +23,8 @@ export class Post {
   @Prop({ type: SchemaType.Types.ObjectId, ref: 'users', required: true })
   author: User;
 
-  @Prop({ type: String, default: '' })
-  restaurant: string;
+  @Prop({ type: SchemaType.Types.ObjectId, ref: 'restaurants', default: null })
+  restaurant: Restaurant;
 
   @Prop({ type: Date, required: true })
   createdAt: Date;
