@@ -17,10 +17,14 @@ import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { RestaurantsService } from './restaurants.service';
 import { UserRoles } from '../auth/enums/user-roles.enum';
+import { PostsService } from '../posts/posts.service';
 
 @Controller('restaurants')
 export class RestaurantsController {
-  constructor(private restaurantsService: RestaurantsService) {}
+  constructor(
+    private restaurantsService: RestaurantsService,
+    private postsService: PostsService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -51,6 +55,11 @@ export class RestaurantsController {
   @Delete(':id')
   async delete(@Request() req, @Param() { id }: IdDto) {
     if (req.user.role === UserRoles.Admin) {
+      await this.postsService.updateMany(
+        { restaurant: id },
+        { $set: { restaurant: null } },
+      );
+
       return await this.restaurantsService.delete({
         _id: id,
       });

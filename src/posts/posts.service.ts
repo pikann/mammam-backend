@@ -58,6 +58,12 @@ export class PostsService {
     return result;
   }
 
+  async updateMany(filter: any, projection = {}): Promise<UpdateResult> {
+    const result = await this.postModel.updateMany(filter, projection).exec();
+
+    return result;
+  }
+
   async delete(filter: FilterQuery<IPost>): Promise<DeleteResult> {
     const result = await this.postModel.deleteOne(filter).exec();
     if (result.deletedCount === 0) {
