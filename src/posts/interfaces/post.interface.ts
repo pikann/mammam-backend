@@ -26,7 +26,7 @@ export interface IShowUser extends Document {
 export interface IShowPost extends Document {
   readonly _id: string;
   readonly createdAt: number;
-  readonly restaurant: IRestaurant;
+  readonly restaurant: IRestaurant | undefined;
   readonly author: IShowUser;
   readonly url: string;
   readonly thumbnail: string;
