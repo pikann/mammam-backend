@@ -388,10 +388,11 @@ export class PostsService {
   async getListOfUser(
     page: number,
     perPage: number,
+    id: string,
     userId: string,
   ): Promise<IShowPost[]> {
     return this.postModel.aggregate([
-      { $match: { author: new Types.ObjectId(userId) } },
+      { $match: { author: new Types.ObjectId(id) } },
       { $sort: { createdAt: -1 } },
       { $skip: page * perPage },
       { $limit: perPage },
@@ -408,6 +409,47 @@ export class PostsService {
           restaurant: { $first: '$restaurant' },
         },
       },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'parent',
+          as: 'comments',
+        },
+      },
+      {
+        $set: {
+          likeTotal: { $size: '$likes' },
+          commentTotal: { $size: '$comments' },
+          viewTotal: { $size: '$views' },
+          shareTotal: 0,
+          isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+          createdAt: { $toLong: '$createdAt' },
+        },
+      },
+      {
+        $project: {
+          vector: 0,
+          comments: 0,
+          likes: 0,
+          author: 0,
+          views: 0,
+        },
+      },
+    ]);
+  }
+
+  async getListOfRestaurant(
+    page: number,
+    perPage: number,
+    id: string,
+    userId: string,
+  ): Promise<IShowPost[]> {
+    return this.postModel.aggregate([
+      { $match: { restaurant: new Types.ObjectId(id) } },
+      { $sort: { createdAt: -1 } },
+      { $skip: page * perPage },
+      { $limit: perPage },
       {
         $lookup: {
           from: 'comments',
