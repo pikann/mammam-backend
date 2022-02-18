@@ -388,10 +388,11 @@ export class PostsService {
   async getListOfUser(
     page: number,
     perPage: number,
+    id: string,
     userId: string,
   ): Promise<IShowPost[]> {
     return this.postModel.aggregate([
-      { $match: { author: new Types.ObjectId(userId) } },
+      { $match: { author: new Types.ObjectId(id) } },
       { $sort: { createdAt: -1 } },
       { $skip: page * perPage },
       { $limit: perPage },
@@ -432,6 +433,62 @@ export class PostsService {
           comments: 0,
           likes: 0,
           author: 0,
+          views: 0,
+        },
+      },
+    ]);
+  }
+
+  async getListOfRestaurant(
+    page: number,
+    perPage: number,
+    id: string,
+    userId: string,
+  ): Promise<IShowPost[]> {
+    return this.postModel.aggregate([
+      { $match: { restaurant: new Types.ObjectId(id) } },
+      { $sort: { createdAt: -1 } },
+      { $skip: page * perPage },
+      { $limit: perPage },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      { $unwind: '$author' },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'parent',
+          as: 'comments',
+        },
+      },
+      {
+        $set: {
+          likeTotal: { $size: '$likes' },
+          commentTotal: { $size: '$comments' },
+          viewTotal: { $size: '$views' },
+          shareTotal: 0,
+          isLiked: { $in: [new Types.ObjectId(userId), '$likes'] },
+          createdAt: { $toLong: '$createdAt' },
+        },
+      },
+      {
+        $project: {
+          vector: 0,
+          comments: 0,
+          likes: 0,
+          restaurant: 0,
+          'author.vector': 0,
+          'author.role': 0,
+          'author.email': 0,
+          'author.password': 0,
+          'author.banning': 0,
+          'author.followers': 0,
           views: 0,
         },
       },

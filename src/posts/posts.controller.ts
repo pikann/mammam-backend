@@ -205,6 +205,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Get('user/:id')
   async getListPostOfUser(
+    @Request() req,
     @Param() { id }: IdDto,
     @Query('page') page: number,
     @Query('perpage') perpage: number,
@@ -221,7 +222,41 @@ export class PostsController {
       totalPage: Math.ceil(total / perpage),
       page,
       perpage,
-      data: await this.postsService.getListOfUser(page, perpage, id),
+      data: await this.postsService.getListOfUser(
+        page,
+        perpage,
+        id,
+        req.user.id,
+      ),
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('restaurant/:id')
+  async getListPostOfRestaurant(
+    @Request() req,
+    @Param() { id }: IdDto,
+    @Query('page') page: number,
+    @Query('perpage') perpage: number,
+  ) {
+    if (!page) page = 0;
+    if (!perpage) perpage = 10;
+
+    const total = await this.postsService.count({
+      restaurant: id,
+    });
+
+    return {
+      total,
+      totalPage: Math.ceil(total / perpage),
+      page,
+      perpage,
+      data: await this.postsService.getListOfRestaurant(
+        page,
+        perpage,
+        id,
+        req.user.id,
+      ),
     };
   }
 
