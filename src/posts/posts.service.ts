@@ -397,6 +397,19 @@ export class PostsService {
       { $limit: perPage },
       {
         $lookup: {
+          from: 'restaurants',
+          localField: 'restaurant',
+          foreignField: '_id',
+          as: 'restaurant',
+        },
+      },
+      {
+        $set: {
+          restaurant: { $first: '$restaurant' },
+        },
+      },
+      {
+        $lookup: {
           from: 'comments',
           localField: '_id',
           foreignField: 'parent',
