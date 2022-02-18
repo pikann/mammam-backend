@@ -13,6 +13,19 @@ export class RestaurantsService {
     private readonly restaurantModel: Model<IRestaurant>,
   ) {}
 
+  async findOne(
+    filter: FilterQuery<IRestaurant>,
+    projection = {},
+  ): Promise<IRestaurant> {
+    const restaurant = await this.restaurantModel
+      .findOne(filter, projection)
+      .exec();
+    if (!restaurant) {
+      throw new HttpException('Restaurant not found', HttpStatus.NOT_FOUND);
+    }
+    return restaurant;
+  }
+
   async find(
     filter: FilterQuery<IRestaurant>,
     projection = {},

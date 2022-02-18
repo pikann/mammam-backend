@@ -64,6 +64,15 @@ export class RestaurantsController {
         _id: id,
       });
     } else {
+      const restaurant = await this.restaurantsService.findOne({
+        _id: id,
+        admin: req.user.id,
+      });
+      await this.postsService.updateMany(
+        { restaurant: restaurant._id },
+        { $set: { restaurant: null } },
+      );
+
       return await this.restaurantsService.delete({
         _id: id,
         admin: req.user.id,
