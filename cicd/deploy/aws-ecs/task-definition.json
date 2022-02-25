@@ -1,6 +1,6 @@
 {
   "ipcMode": null,
-  "executionRoleArn": "arn:aws:iam::905405577134:role/iam-mammam-role-ECSTaskExecutionRole-dev",
+  "executionRoleArn": "arn:aws:iam::802048599018:role/iam-mammam-role-ECSTaskExecutionRole-dev",
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
@@ -37,7 +37,7 @@
       "memoryReservation": null,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "905405577134.dkr.ecr.ap-southeast-1.amazonaws.com/mammam-dev:latest",
+      "image": "802048599018.dkr.ecr.ap-southeast-1.amazonaws.com/mammam-dev:latest",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -64,7 +64,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:905405577134:task-definition/mammam-dev:1",
+  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:802048599018:task-definition/mammam-dev:1",
   "family": "mammam-dev",
   "requiresAttributes": [
     {
