@@ -39,7 +39,7 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: 905405577134.dkr.ecr.ap-southeast-1.amazonaws.com
+          ECR_REGISTRY: 802048599018.dkr.ecr.ap-southeast-1.amazonaws.com
           ECR_REPOSITORY: mammam-dev
           IMAGE_TAG: ${{ github.sha }}
         run: |
